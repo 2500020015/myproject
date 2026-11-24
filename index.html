@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EventX | Event Management</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+body{background:#0b0b16;color:#fff;min-height:100vh}
+header{display:flex;justify-content:space-between;align-items:center;gap:18px;padding:20px 7%;background:#121222;border-bottom:1px solid #292943;flex-wrap:wrap}
+.logo{color:#a78bfa;font-size:27px;font-weight:800;letter-spacing:1px}
+nav{display:flex;gap:10px;flex-wrap:wrap}
+nav button{background:none;color:#eee;border:0;padding:9px;cursor:pointer;font-size:14px}
+nav button:hover,a{color:#c4a7ff}
+.container{width:86%;max-width:1200px;margin:38px auto}
+.hero{padding:75px 30px;border-radius:20px;background:linear-gradient(120deg,#422078,#17172e);text-align:center}
+.hero h1{font-size:clamp(30px,5vw,48px);margin-bottom:15px}
+.hero p{color:#ddd4f0;margin-bottom:25px;line-height:1.6}
+button.primary{background:#8b5cf6;color:#fff;padding:12px 22px;border:0;border-radius:8px;cursor:pointer;margin:5px}
+button.primary:hover{background:#7041d8}
+.section-title{margin:34px 0 18px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(235px,1fr));gap:18px}
+.card,.panel{background:#171729;border:1px solid #30304b;padding:22px;border-radius:14px}
+.card h3{color:#c4a7ff;margin-bottom:12px}
+.card p{color:#c2c2d1;margin:9px 0;font-size:14px;line-height:1.5;overflow-wrap:anywhere}
+.panel{max-width:450px;margin:48px auto}
+.panel h2{color:#c4a7ff;margin-bottom:18px}
+input,textarea{width:100%;padding:13px;margin:8px 0;border-radius:7px;border:1px solid #383851;background:#10101e;color:white;outline:none}
+input:focus,textarea:focus{border-color:#a78bfa}
+textarea{min-height:90px;resize:vertical}
+.panel button{width:100%;margin:10px 0}
+.hidden{display:none!important}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:14px;margin:22px 0}
+.stat{background:#202039;padding:20px;border-radius:12px;color:#c9c9d8}
+.stat h2{color:#a78bfa;margin-top:8px}
+.danger,.secondary{border:0;padding:9px 14px;border-radius:6px;cursor:pointer;margin:5px}
+.danger{background:#dc3545;color:white}
+.secondary{background:#34344d;color:white}
+.muted{color:#aaa;font-size:13px;margin-top:12px;line-height:1.5}
+footer{text-align:center;padding:28px;color:#85859a;margin-top:45px}
+@media(max-width:600px){header{justify-content:center;text-align:center}.container{width:92%}.hero{padding:55px 20px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">EVENTX.</div>
+  <nav>
+    <button onclick="showPage('home')">Home</button>
+    <button onclick="showPage('events')">Events</button>
+    <button onclick="showPage('login')">User Login</button>
+    <button onclick="showPage('register')">Sign Up</button>
+    <button onclick="showPage('adminLogin')">Admin</button>
+    <button onclick="logout()">Logout</button>
+  </nav>
+</header>
+
+<main>
+<section id="home" class="container">
+  <div class="hero">
+    <h1>Make Every Event Special.</h1>
+    <p>Discover, organize and experience unforgettable events.<br>One platform for event organizers and attendees.</p>
+    <button class="primary" onclick="showPage('events')">Explore Events</button>
+    <button class="primary" onclick="showPage('register')">Get Started</button>
+  </div>
+  <h2 class="section-title">Why Choose EventX?</h2>
+  <div class="grid">
+    <article class="card"><h3>Easy Registration</h3><p>Register for your favourite events in a few clicks.</p></article>
+    <article class="card"><h3>Event Management</h3><p>Organizers can create and manage events from one dashboard.</p></article>
+    <article class="card"><h3>Stay Organized</h3><p>Keep track of your event registrations in one place.</p></article>
+  </div>
+</section>
+
+<section id="events" class="container hidden">
+  <h2 class="section-title">Upcoming Events</h2>
+  <div id="eventList" class="grid"></div>
+</section>
+
+<section id="register" class="panel hidden">
+  <h2>Create User Account</h2>
+  <input id="regName" placeholder="Full name" autocomplete="name">
+  <input id="regEmail" type="email" placeholder="Email address" autocomplete="email">
+  <input id="regPassword" type="password" placeholder="Password" autocomplete="new-password">
+  <button class="primary" onclick="registerUser()">Create Account</button>
+  <p class="muted">Already have an account? <a href="#" onclick="showPage('login')">Login</a></p>
+</section>
+
+<section id="login" class="panel hidden">
+  <h2>User Login</h2>
+  <input id="loginEmail" type="email" placeholder="Email address" autocomplete="username">
+  <input id="loginPassword" type="password" placeholder="Password" autocomplete="current-password">
+  <button class="primary" onclick="userLogin()">Login</button>
+  <p class="muted">New here? <a href="#" onclick="showPage('register')">Create an account</a></p>
+</section>
+
+<section id="adminLogin" class="panel hidden">
+  <h2>Administrator Login</h2>
+  <input id="adminEmail" type="email" placeholder="Admin email">
+  <input id="adminPassword" type="password" placeholder="Admin password">
+  <button class="primary" onclick="adminLogin()">Admin Login</button>
+  <p class="muted">Demo credentials are provided in README.txt.</p>
+</section>
+
+<section id="userDashboard" class="container hidden">
+  <h2 class="section-title">Welcome, <span id="userName"></span>!</h2>
+  <div class="card"><h3>Your Dashboard</h3><p>View the events you have registered for below.</p></div>
+  <h2 class="section-title">My Registered Events</h2>
+  <div id="myEvents" class="grid"></div>
+</section>
+
+<section id="adminDashboard" class="container hidden">
+  <h2 class="section-title">Admin Dashboard</h2>
+  <div class="stats">
+    <div class="stat">Total Events<h2 id="totalEvents">0</h2></div>
+    <div class="stat">Total Users<h2 id="totalUsers">0</h2></div>
+    <div class="stat">Registrations<h2 id="totalRegistrations">0</h2></div>
+  </div>
+  <div class="card">
+    <h3>Create New Event</h3>
+    <input id="eventName" placeholder="Event name">
+    <input id="eventDate" type="date">
+    <input id="eventLocation" placeholder="Event location">
+    <input id="eventPrice" type="number" min="0" placeholder="Ticket price (₹)">
+    <textarea id="eventDescription" placeholder="Event description"></textarea>
+    <button class="primary" onclick="addEvent()">Create Event</button>
+  </div>
+  <h2 class="section-title">Manage Events</h2>
+  <div id="adminEvents" class="grid"></div>
+  <h2 class="section-title">Registered Users</h2>
+  <div id="adminUsers" class="grid"></div>
+</section>
+</main>
+
+<footer>© 2026 EVENTX. All Rights Reserved.</footer>
+
+<script>
+const defaultEvents = [
+ {id:1,name:"Music Festival",date:"2026-12-15",location:"Main Auditorium",price:500,description:"Experience an unforgettable night of music."},
+ {id:2,name:"Technology Conference",date:"2026-12-20",location:"Convention Centre",price:300,description:"Discover the latest technology and innovations."},
+ {id:3,name:"Sports Championship",date:"2027-01-10",location:"University Stadium",price:200,description:"Join us for an exciting sports competition."}
+];
+const read = (key,fallback) => {
+ try { const value=localStorage.getItem(key); return value ? JSON.parse(value) : fallback; }
+ catch { return fallback; }
+};
+let users=read("eventx_users",[]);
+let events=read("eventx_events",defaultEvents);
+let registrations=read("eventx_registrations",[]);
+let currentUser=read("eventx_currentUser",null);
+let isAdmin=sessionStorage.getItem("eventx_isAdmin")==="true";
+
+function saveData(){
+ localStorage.setItem("eventx_users",JSON.stringify(users));
+ localStorage.setItem("eventx_events",JSON.stringify(events));
+ localStorage.setItem("eventx_registrations",JSON.stringify(registrations));
+}
+function escapeHTML(value){
+ return String(value).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+function showPage(page){
+ document.querySelectorAll("main > section").forEach(s=>s.classList.add("hidden"));
+ document.getElementById(page).classList.remove("hidden");
+ if(page==="events") displayEvents();
+ if(page==="adminDashboard") updateAdmin();
+ if(page==="userDashboard") updateUser();
+}
+function registerUser(){
+ const name=document.getElementById("regName").value.trim();
+ const email=document.getElementById("regEmail").value.trim().toLowerCase();
+ const password=document.getElementById("regPassword").value;
+ if(!name||!email||!password) return alert("Please fill in all fields.");
+ if(password.length<6) return alert("Password must be at least 6 characters.");
+ if(users.some(u=>u.email===email)) return alert("An account with this email already exists.");
+ users.push({name,email,password}); saveData();
+ alert("Account created. Please log in."); showPage("login");
+}
+function userLogin(){
+ const email=document.getElementById("loginEmail").value.trim().toLowerCase();
+ const password=document.getElementById("loginPassword").value;
+ const user=users.find(u=>u.email===email&&u.password===password);
+ if(!user) return alert("Invalid email or password.");
+ currentUser={name:user.name,email:user.email};
+ localStorage.setItem("eventx_currentUser",JSON.stringify(currentUser));
+ isAdmin=false; sessionStorage.removeItem("eventx_isAdmin");
+ alert("Login successful!"); showPage("userDashboard");
+}
+function adminLogin(){
+ const email=document.getElementById("adminEmail").value.trim();
+ const password=document.getElementById("adminPassword").value;
+ if(email==="admin@eventx.com"&&password==="admin123"){
+  currentUser=null; localStorage.removeItem("eventx_currentUser");
+  isAdmin=true; sessionStorage.setItem("eventx_isAdmin","true");
+  alert("Admin login successful!"); showPage("adminDashboard");
+ }else alert("Invalid admin credentials.");
+}
+function displayEvents(){
+ const list=document.getElementById("eventList"); list.innerHTML="";
+ if(!events.length){list.innerHTML="<p>No events available yet.</p>";return;}
+ events.forEach(e=>{
+  list.innerHTML+=`<article class="card"><h3>${escapeHTML(e.name)}</h3><p>📅 ${escapeHTML(e.date)}</p><p>📍 ${escapeHTML(e.location)}</p><p>Ticket Price: ₹${Number(e.price).toFixed(2)}</p><p>${escapeHTML(e.description)}</p><button class="primary" onclick="registerForEvent(${Number(e.id)})">Register Now</button></article>`;
+ });
+}
+function registerForEvent(id){
+ if(!currentUser){alert("Please log in as a user first.");showPage("login");return;}
+ if(registrations.some(r=>r.eventId===id&&r.email===currentUser.email)) return alert("You are already registered for this event.");
+ registrations.push({eventId:id,email:currentUser.email}); saveData();
+ alert("Registration successful!"); updateUser();
+}
+function updateUser(){
+ if(!currentUser){showPage("login");return;}
+ document.getElementById("userName").textContent=currentUser.name;
+ const list=document.getElementById("myEvents");
+ const mine=registrations.filter(r=>r.email===currentUser.email);
+ const items=mine.map(r=>events.find(e=>e.id===r.eventId)).filter(Boolean);
+ list.innerHTML=items.length?items.map(e=>`<article class="card"><h3>${escapeHTML(e.name)}</h3><p>📅 ${escapeHTML(e.date)}</p><p>📍 ${escapeHTML(e.location)}</p><p>Registration Status: Confirmed</p></article>`).join(""):"<p>You have not registered for any events yet.</p>";
+}
+function addEvent(){
+ if(!isAdmin)return alert("Admin access required.");
+ const name=document.getElementById("eventName").value.trim();
+ const date=document.getElementById("eventDate").value;
+ const location=document.getElementById("eventLocation").value.trim();
+ const priceInput=document.getElementById("eventPrice").value;
+ const price=Number(priceInput);
+ const description=document.getElementById("eventDescription").value.trim();
+ if(!name||!date||!location||priceInput===""||!Number.isFinite(price)||price<0||!description) return alert("Please enter valid details in every field.");
+ events.push({id:Date.now(),name,date,location,price,description}); saveData();
+ ["eventName","eventDate","eventLocation","eventPrice","eventDescription"].forEach(id=>document.getElementById(id).value="");
+ alert("Event created successfully!"); updateAdmin();
+}
+function updateAdmin(){
+ if(!isAdmin){showPage("adminLogin");return;}
+ document.getElementById("totalEvents").textContent=events.length;
+ document.getElementById("totalUsers").textContent=users.length;
+ document.getElementById("totalRegistrations").textContent=registrations.length;
+ document.getElementById("adminEvents").innerHTML=events.length?events.map(e=>`<article class="card"><h3>${escapeHTML(e.name)}</h3><p>${escapeHTML(e.date)} · ${escapeHTML(e.location)}</p><p>Ticket: ₹${Number(e.price).toFixed(2)}</p><button class="danger" onclick="deleteEvent(${Number(e.id)})">Delete Event</button></article>`).join(""):"<p>No events created.</p>";
+ document.getElementById("adminUsers").innerHTML=users.length?users.map(u=>`<article class="card"><h3>${escapeHTML(u.name)}</h3><p>${escapeHTML(u.email)}</p><p>Registrations: ${registrations.filter(r=>r.email===u.email).length}</p></article>`).join(""):"<p>No users registered yet.</p>";
+}
+function deleteEvent(id){
+ if(!isAdmin)return;
+ if(confirm("Delete this event and its registrations?")){
+  events=events.filter(e=>e.id!==id);
+  registrations=registrations.filter(r=>r.eventId!==id);
+  saveData(); updateAdmin();
+ }
+}
+function logout(){
+ currentUser=null; isAdmin=false;
+ localStorage.removeItem("eventx_currentUser");
+ sessionStorage.removeItem("eventx_isAdmin");
+ alert("You have been logged out."); showPage("home");
+}
+saveData();
+if(isAdmin) showPage("adminDashboard");
+else if(currentUser) showPage("userDashboard");
+else showPage("home");
+</script>
+</body>
+</html>
