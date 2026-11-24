@@ -1,0 +1,685 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tasty Bite | Restaurant Billing</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+    background: #f5f3ef;
+    color: #292929;
+}
+
+header {
+    background: #241b18;
+    color: white;
+    padding: 22px 6%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header h1 {
+    color: #ffad55;
+    letter-spacing: 1px;
+}
+
+header span {
+    font-size: 13px;
+    color: #ddd;
+}
+
+.container {
+    padding: 30px 6%;
+}
+
+.welcome {
+    background: linear-gradient(120deg, #48271d, #a64e2d);
+    color: white;
+    padding: 35px;
+    border-radius: 16px;
+    margin-bottom: 30px;
+}
+
+.welcome h2 {
+    font-size: 30px;
+    margin-bottom: 10px;
+}
+
+.welcome p {
+    color: #f4d8c9;
+}
+
+.layout {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 25px;
+}
+
+h2.section-title {
+    margin-bottom: 18px;
+}
+
+.menu {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 18px;
+}
+
+.food-card {
+    background: white;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px #0000000c;
+    transition: 0.3s;
+}
+
+.food-card:hover {
+    transform: translateY(-5px);
+}
+
+.food-card img {
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+}
+
+.food-info {
+    padding: 15px;
+}
+
+.food-info h3 {
+    margin-bottom: 8px;
+}
+
+.food-info p {
+    color: #a64e2d;
+    font-weight: bold;
+    margin-bottom: 12px;
+}
+
+button {
+    border: none;
+    padding: 10px 15px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.add-btn {
+    background: #a64e2d;
+    color: white;
+    width: 100%;
+}
+
+button:hover {
+    opacity: 0.85;
+}
+
+.cart {
+    background: white;
+    padding: 22px;
+    border-radius: 14px;
+    box-shadow: 0 4px 15px #0000000c;
+    height: fit-content;
+}
+
+.cart input {
+    width: 100%;
+    padding: 11px;
+    margin: 10px 0 18px;
+    border: 1px solid #ddd;
+    border-radius: 7px;
+}
+
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding: 12px 0;
+    gap: 8px;
+}
+
+.cart-item small {
+    color: #777;
+}
+
+.quantity button {
+    padding: 4px 9px;
+    background: #eee;
+}
+
+.remove {
+    color: #c0392b;
+    background: none;
+    padding: 4px;
+}
+
+.bill-line {
+    display: flex;
+    justify-content: space-between;
+    margin: 13px 0;
+}
+
+.grand-total {
+    font-size: 20px;
+    font-weight: bold;
+    color: #a64e2d;
+    border-top: 1px solid #ddd;
+    padding-top: 15px;
+}
+
+.checkout {
+    background: #a64e2d;
+    color: white;
+    width: 100%;
+    margin-top: 15px;
+    padding: 14px;
+}
+
+.secondary {
+    background: #292929;
+    color: white;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.admin {
+    margin-top: 35px;
+    background: white;
+    padding: 25px;
+    border-radius: 14px;
+}
+
+.admin input {
+    padding: 11px;
+    border: 1px solid #ddd;
+    border-radius: 7px;
+    margin: 8px 5px 8px 0;
+}
+
+.admin button {
+    background: #292929;
+    color: white;
+}
+
+.history {
+    margin-top: 30px;
+    background: white;
+    padding: 25px;
+    border-radius: 14px;
+}
+
+.order {
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+}
+
+footer {
+    background: #241b18;
+    color: white;
+    text-align: center;
+    padding: 22px;
+    margin-top: 40px;
+}
+
+#receipt {
+    display: none;
+    background: white;
+    padding: 25px;
+    margin-top: 25px;
+    border: 1px dashed #777;
+    border-radius: 10px;
+}
+
+@media(max-width: 850px) {
+    .layout {
+        grid-template-columns: 1fr;
+    }
+
+    header {
+        flex-direction: column;
+        gap: 8px;
+    }
+}
+
+@media print {
+    body * {
+        visibility: hidden;
+    }
+
+    #receipt, #receipt * {
+        visibility: visible;
+    }
+
+    #receipt {
+        display: block !important;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🍽 TASTY BITE</h1>
+    <span>RESTAURANT BILLING SYSTEM</span>
+</header>
+
+<div class="container">
+
+<section class="welcome">
+    <h2>Welcome to Tasty Bite!</h2>
+    <p>Fresh food, great taste and a wonderful dining experience.</p>
+</section>
+
+<div class="layout">
+
+<!-- FOOD MENU -->
+<section>
+    <h2 class="section-title">🍔 Our Food Menu</h2>
+    <div class="menu" id="menu"></div>
+</section>
+
+<!-- SHOPPING CART -->
+<section class="cart">
+    <h2>🛒 Your Order</h2>
+
+    <label>Customer Name</label>
+    <input type="text" id="customer" placeholder="Enter customer name">
+
+    <div id="cartItems">
+        <p>Your cart is empty.</p>
+    </div>
+
+    <hr style="margin:15px 0">
+
+    <div class="bill-line">
+        <span>Subtotal</span>
+        <span id="subtotal">₹0.00</span>
+    </div>
+
+    <div class="bill-line">
+        <span>GST (5%)</span>
+        <span id="tax">₹0.00</span>
+    </div>
+
+    <div class="bill-line grand-total">
+        <span>Total</span>
+        <span id="total">₹0.00</span>
+    </div>
+
+    <button class="checkout" onclick="checkout()">
+        Generate Bill
+    </button>
+
+    <button class="secondary" onclick="clearCart()">
+        Clear Cart
+    </button>
+</section>
+
+</div>
+
+<!-- ADMIN SECTION -->
+<section class="admin">
+    <h2>⚙️ Admin – Manage Menu</h2>
+    <p style="color:#777;margin:10px 0">
+        Add new food items and update your restaurant menu.
+    </p>
+
+    <input id="newName" placeholder="Food name">
+    <input id="newPrice" type="number" placeholder="Price (₹)">
+    <input id="newImage" placeholder="Image URL (optional)">
+
+    <button onclick="addFood()">+ Add Food</button>
+</section>
+
+<!-- ORDER HISTORY -->
+<section class="history">
+    <h2>📋 Order History</h2>
+    <div id="history"></div>
+</section>
+
+<!-- RECEIPT -->
+<section id="receipt"></section>
+
+</div>
+
+<footer>
+    <p>© 2026 Tasty Bite Restaurant | All Rights Reserved</p>
+    <p style="margin-top:6px;color:#ffad55">
+        Thank you for choosing us!
+    </p>
+</footer>
+
+<script>
+
+// DEFAULT FOOD MENU
+
+const defaultMenu = [
+    {
+        name:"Burger",
+        price:120,
+        image:"https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500"
+    },
+    {
+        name:"Pizza",
+        price:250,
+        image:"https://images.unsplash.com/photo-1513104890138-7c749659a591?w=500"
+    },
+    {
+        name:"French Fries",
+        price:80,
+        image:"https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=500"
+    },
+    {
+        name:"Pasta",
+        price:180,
+        image:"https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=500"
+    },
+    {
+        name:"Sandwich",
+        price:100,
+        image:"https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=500"
+    },
+    {
+        name:"Chicken Biryani",
+        price:220,
+        image:"https://images.unsplash.com/photo-1563379091339-03246963d96c?w=500"
+    }
+];
+
+// LOAD AND SAVE DATA
+
+let foodMenu = JSON.parse(localStorage.getItem("foodMenu"))
+    || defaultMenu;
+
+let cart = [];
+
+let orders = JSON.parse(localStorage.getItem("orders"))
+    || [];
+
+function saveData() {
+    localStorage.setItem("foodMenu", JSON.stringify(foodMenu));
+    localStorage.setItem("orders", JSON.stringify(orders));
+}
+
+// DISPLAY FOOD MENU
+
+function displayMenu() {
+    const menu = document.getElementById("menu");
+    menu.innerHTML = "";
+
+    foodMenu.forEach((food, index) => {
+        menu.innerHTML += `
+            <div class="food-card">
+                <img src="${food.image}"
+                     alt="${food.name}"
+                     onerror="this.src='https://placehold.co/400x200?text=Food'">
+
+                <div class="food-info">
+                    <h3>${food.name}</h3>
+                    <p>₹${food.price.toFixed(2)}</p>
+                    <button class="add-btn"
+                        onclick="addToCart(${index})">
+                        Add to Order +
+                    </button>
+                </div>
+            </div>
+        `;
+    });
+}
+
+// ADD TO CART
+
+function addToCart(index) {
+    const food = foodMenu[index];
+
+    const existing = cart.find(item => item.name === food.name);
+
+    if(existing) {
+        existing.quantity++;
+    } else {
+        cart.push({
+            name: food.name,
+            price: food.price,
+            quantity: 1
+        });
+    }
+
+    displayCart();
+}
+
+// DISPLAY CART
+
+function displayCart() {
+    const container = document.getElementById("cartItems");
+
+    if(cart.length === 0) {
+        container.innerHTML = "<p>Your cart is empty.</p>";
+    } else {
+        container.innerHTML = cart.map((item, index) => `
+            <div class="cart-item">
+                <div>
+                    <strong>${item.name}</strong><br>
+                    <small>₹${item.price} each</small>
+                </div>
+
+                <div class="quantity">
+                    <button onclick="changeQty(${index},-1)">-</button>
+                    ${item.quantity}
+                    <button onclick="changeQty(${index},1)">+</button>
+                </div>
+
+                <button class="remove"
+                    onclick="removeItem(${index})">✕</button>
+            </div>
+        `).join("");
+    }
+
+    calculateBill();
+}
+
+// CHANGE QUANTITY
+
+function changeQty(index, amount) {
+    cart[index].quantity += amount;
+
+    if(cart[index].quantity <= 0) {
+        cart.splice(index, 1);
+    }
+
+    displayCart();
+}
+
+// REMOVE ITEM
+
+function removeItem(index) {
+    cart.splice(index, 1);
+    displayCart();
+}
+
+// CALCULATE BILL
+
+function calculateBill() {
+    let subtotal = cart.reduce(
+        (sum, item) => sum + item.price * item.quantity, 0
+    );
+
+    let tax = subtotal * 0.05;
+    let total = subtotal + tax;
+
+    document.getElementById("subtotal").innerText =
+        "₹" + subtotal.toFixed(2);
+
+    document.getElementById("tax").innerText =
+        "₹" + tax.toFixed(2);
+
+    document.getElementById("total").innerText =
+        "₹" + total.toFixed(2);
+
+    return {subtotal, tax, total};
+}
+
+// CLEAR CART
+
+function clearCart() {
+    cart = [];
+    displayCart();
+}
+
+// CHECKOUT AND GENERATE RECEIPT
+
+function checkout() {
+
+    const customer = document.getElementById("customer").value.trim();
+
+    if(customer === "") {
+        alert("Please enter customer name!");
+        return;
+    }
+
+    if(cart.length === 0) {
+        alert("Please add food items first!");
+        return;
+    }
+
+    const bill = calculateBill();
+
+    const date = new Date().toLocaleString();
+
+    const order = {
+        customer: customer,
+        date: date,
+        items: [...cart],
+        total: bill.total
+    };
+
+    orders.push(order);
+    saveData();
+
+    let receipt = `
+        <h2 style="text-align:center">🍽 TASTY BITE</h2>
+        <p style="text-align:center">Restaurant Billing Receipt</p>
+        <hr>
+        <p>Customer: ${customer}</p>
+        <p>Date: ${date}</p>
+        <hr>
+        <h3>Ordered Items</h3>
+    `;
+
+    cart.forEach(item => {
+        receipt += `
+            <p>${item.name} x ${item.quantity}
+            = ₹${(item.price * item.quantity).toFixed(2)}</p>
+        `;
+    });
+
+    receipt += `
+        <hr>
+        <p>Subtotal: ₹${bill.subtotal.toFixed(2)}</p>
+        <p>GST (5%): ₹${bill.tax.toFixed(2)}</p>
+        <h2>Grand Total: ₹${bill.total.toFixed(2)}</h2>
+        <hr>
+        <p style="text-align:center">
+            Thank you! Visit Again!
+        </p>
+        <button onclick="window.print()">Print Receipt</button>
+    `;
+
+    const receiptBox = document.getElementById("receipt");
+
+    receiptBox.innerHTML = receipt;
+    receiptBox.style.display = "block";
+
+    displayHistory();
+
+    cart = [];
+    displayCart();
+
+    document.getElementById("customer").value = "";
+
+    receiptBox.scrollIntoView({behavior:"smooth"});
+}
+
+// ADD NEW FOOD ITEM
+
+function addFood() {
+
+    const name = document.getElementById("newName").value.trim();
+    const price = Number(document.getElementById("newPrice").value);
+    const image = document.getElementById("newImage").value.trim();
+
+    if(!name || !Number.isFinite(price) || price <= 0) {
+        alert("Enter a valid food name and price!");
+        return;
+    }
+
+    if(foodMenu.some(food =>
+        food.name.toLowerCase() === name.toLowerCase()
+    )) {
+        alert("This food item already exists!");
+        return;
+    }
+
+    foodMenu.push({
+        name: name,
+        price: price,
+        image: image || "https://placehold.co/400x200?text=Food"
+    });
+
+    saveData();
+    displayMenu();
+
+    document.getElementById("newName").value = "";
+    document.getElementById("newPrice").value = "";
+    document.getElementById("newImage").value = "";
+
+    alert("Food item added successfully!");
+}
+
+// ORDER HISTORY
+
+function displayHistory() {
+
+    const history = document.getElementById("history");
+
+    if(orders.length === 0) {
+        history.innerHTML = "<p>No orders yet.</p>";
+        return;
+    }
+
+    history.innerHTML = orders.slice().reverse().map(order => `
+        <div class="order">
+            <strong>${order.customer}</strong>
+            <p style="color:#777">${order.date}</p>
+            <p>Total: ₹${Number(order.total).toFixed(2)}</p>
+        </div>
+    `).join("");
+}
+
+// INITIALIZE APPLICATION
+
+displayMenu();
+displayCart();
+displayHistory();
+
+</script>
+
+</body>
+</html>
